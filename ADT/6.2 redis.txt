@@ -1,0 +1,11 @@
+Create Operation:
+set info "This is Create Operation in Redis"
+
+Read Operation:
+get info
+
+Update Operation:
+set info "This is the updated value of key in Redis"
+
+Delete Operation:
+del info

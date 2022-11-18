@@ -1,0 +1,29 @@
+1> Open cmd and type cassandra -f (do not close this cmd)
+2> Open new cmd and type cqlsh
+3> Perform query
+
+a> Create Database Query
+CREATE KEYSPACE employee WITH replication = {'class': 'SimpleStrategy',
+'replication_factor': '1'};
+
+b> Use Table Query
+use employee;
+
+c> Create Table Query
+CREATE TABLE employee(ID int, Name text Primary Key, City text);
+
+d> Insert Query
+Insert into employee (ID,City,Name) values(01,'Mumbai','emp1');
+Insert into employee (ID,City,Name) values(02,'Pune','emp2');
+Insert into employee (ID,City,Name) values(03,'Goa','emp3');
+Insert into employee (ID,City,Name) values(04,'Mirzapur','emp4');
+Insert into employee (ID,City,Name) values(05,'Mulshi','emp5');
+
+e> Read Query
+select * from employee;
+
+f> Update Query
+update employee SET city=’Satara’ where name=’emp2’;
+
+g> Delete Query
+DELETE city FROM employee WHERE name = ‘emp5’;

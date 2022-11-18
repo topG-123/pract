@@ -1,0 +1,28 @@
+create table student(roll number(10), s_name varchar(15), s_join_date date, s_leavedate date);
+
+insert into student values(101,’Andrew’,’06-june-2006’,’06-june-2009’);
+insert into student values(102,’Tristan’,’08-feb-2007’,’08-mar-2009’);
+insert into student values(103,’Luc’,’12-mar-2007’,’16-apr-2009’);
+insert into student values(104,’Peter’,’19-apr-2008’,’10-may-2009’);
+insert into student values(105,’Jordan’,’20-jan-2009’,’10-oct-2014’);
+
+select * from student;
+
+commit;
+
+select * from student where s_join_date=‟19-apr-08‟;
+
+create table time_shares
+(C_name varchar2(20),
+No_shares number(10),
+Price number(10),
+Trans_Time varchar2(10) Default to_char(sysdate, „HH:MI‟));
+
+insert into time_shares values('Andrew',121,600,To_char(sysdate,'HH:MI'));
+insert into time_shares values('Tristan',123,500,To_char(sysdate,'HH:MI'));
+insert into time_shares values('Luc',141,251,To_char(sysdate,'HH:MI'));
+insert into time_shares values('Peter',203,700,To_char(sysdate,'HH:MI'));
+insert into time_shares values('Jordan',200,551,To_char(sysdate,'HH:MI'));
+
+Read records from table where price >= 500 and TransTime=‟09:57‟;
+select * from time_shares where price>100 and trans_time='12:52';

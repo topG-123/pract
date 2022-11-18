@@ -1,0 +1,15 @@
+1)Install CouchDB 
+While installation set your username and password.
+2)Launch Apache CouchDB Fauxton 
+Login using username and password.
+
+Click on Create Database > provide database name: test > Create
+
+Database gets created successfully.
+Now, insert data in the database, by clicking on „Create document‟ on RHS
+
+Insert column name and data, after id tag (id tag is already created do not modify it.)
+
+Insert multiple records
+
+Now, click on „Run a query with Mango‟ > click on „manage indexes‟

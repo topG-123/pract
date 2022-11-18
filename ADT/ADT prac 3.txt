@@ -1,0 +1,39 @@
+conn system/patkar@db1
+
+create table employee(enumber int Primary key, ename varchar(20), address varchar(30), email varchar(20), salary int);
+
+insert into employee values(1,'andrew','Andheri','andrew@gmail.com',100000);
+insert into employee values(2,'tristan','churchgate','tristan@gmail.com',60000);
+insert into employee values(3,'luc','marines','luc@gmail.com',80000);
+insert into employee values(4,'peter','Borivali',peter@gmail.com',10000);
+insert into employee values(5,'jordan','Goregaon','jordan@gmail.com',20000);
+
+select * from employee;
+
+Create database link db1todb2 connect to system identified by patkar using 'db2';
+
+Conn system/patkar@db2
+
+Create database link db2todb1 connect to system identified by patkar using 'db1';
+
+Create table emp1 as select enumber, ename, salary from employee@db2todb1;
+
+select * from emp1;
+
+Create table emp2 as select enumber, ename, email from employee@db2todb1;
+
+select * from emp2;
+
+Create table emp3 as select enumber, email, address from employee@db2todb1;
+
+select * from emp3;
+
+Create table emp4 as select enumber, ename, address from employee@db2todb1;
+
+select * from emp4;
+
+Select salary from emp1;
+
+Select email form emp3 where address=’Andheri’;
+
+Select email, address form emp4 where enumber=3;

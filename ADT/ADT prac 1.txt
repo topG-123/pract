@@ -1,0 +1,30 @@
+Create or replace type AddrType1 as object (PinQuery number (5), Street char(20), City varchar2(50), state varchar2(40), no number(4) );
+Create or replace type BranchType as object (address AddrType1, phone1 int, phone2 int );
+Create or replace type BranchTableType as table of BranchType;
+Create or replace type AuthorType as object (name varchar2 (50), addr AddrType1);
+Create table Author of AuthorType;
+Create or replace type AuthorListType as varray(10) of ref AuthorType ;
+Create or replace type PublisherType as object(name varchar2(50), addr AddrType1, branches BranchTableType);
+Create table Publishers of PublisherType NESTED TABLE branches STORE as branchtable;
+Create table books(title varchar2(50), year date, published_by ref PublisherType, authors AuthorListType);
+
+insert into Author values('Sahil', AddrType1(7000,'AT street', 'mumbai', 'maharashtra' ,1007));
+
+insert into Publishers values ('Sahil', AddrType1 (4002,'PK street', 'mumbai','maharashtra',03), BranchTableType(BranchType (AddrType1(5002,'PL street', 'mumbai', 'maharashtra', 03), 23406,69896)));
+
+insert into books select 'IP','28-may-1983', ref (pub), AuthorListType(ref(aut)) from Publishers pub, Author aut where pub.name='Sahil' and aut.name='andrew';
+
+insert into books select 'ADBMS','09-jan-1890',ref(pub), AuthorListType(ref(aut)) from Publishers pub, Author aut where pub.name='tristan' and aut.name='luc';
+
+insert into books select 'c prog','25-may-1983', ref (pub),AuthorListType(ref(aut)) from Publishers pub, Author aut where pub.name='Suyash' and aut.name='Sahil';
+
+select a.name from Author a, Publishers p where a.addr.pinQuery = p.addr.pinQuery;
+
+Select title from books b where 2 <= (select count(*) from table(b.authors));
+
+Select p.name from publishers p, table (p.branches)
+group by p.name having count(*)> = all (select count(*)from publishers p, table(p.branches) group by name);
+
+select a.name from authors a where not exists(select b.title from books b,table(select authors from books b1 where b.title=b1.title)where a.name=name);
+
+select a.name from authors a, books b, table (b.authors) v where v.column_value = ref(a) group by a.name having count(*) > 1;

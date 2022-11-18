@@ -1,0 +1,9 @@
+#To create a collection
+db.createCollection("andrew")
+
+#To create indexes
+db.andrew.createIndex({“name”:1})
+db.andrew.createIndex({“salary”:2})
+
+#To get indexes
+db.andrew.getIndexes()

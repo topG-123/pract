@@ -1,0 +1,23 @@
+Creating a table named “student”
+create table student (id int, name text Primary Key, branch text, phone varint, city text);
+
+Inserting data into the table “student”
+INSERT INTO student (id, name, branch, phone, city)VALUES (1, 'Lara', 'Computer Engineering',9999999999, 'Boston');
+INSERT INTO student (id, name, branch, phone, city)VALUES (2, 'Krunal', 'Electrical Engineering',8888888888, 'New York City');
+INSERT INTO student (id, name, branch, phone, city)VALUES (3, 'Myra', 'Applied Physics',7777777777, 'London');
+INSERT INTO student (id, name, branch, phone, city) VALUES (4, 'Nysa', 'MBA', 5555555555,'UK');
+INSERT INTO student (id, name, branch, phone, city) VALUES (5, 'Mayur', 'MSC', 6666666666,'Australia');
+
+Read Operation:
+SELECT *FROM student;
+
+Update Operation:
+UPDATE student SET city='San Fransisco'WHERE name = 'Nysa';
+Read operation: 
+SELECT *FROM student;
+
+Delete Operation:
+DELETE phone FROM student WHERE name = 'Lara';
+Read operation:
+SELECT *FROM student;
+

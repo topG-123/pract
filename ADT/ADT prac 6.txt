@@ -1,0 +1,21 @@
+#mongo db#
+db.createCollection("andrew_tate")
+
+db.fruits.insertOne({“id”: 1, “Name”: “Apple”, ”Seasons”: “All Season”, “Rating”: 3})
+db.fruits.insertOne({“id”: 2, “Name”: “Mango”, ”Seasons”: “Summer Season”, “Rating”: 5})
+db.fruits.insertOne({“id”: 3, “Name”: “Banana”, ”Seasons”: “All Season”, “Rating”: 3})
+db.fruits.insertOne({“id”: 4, “Name”: “Grapes”, ”Seasons”: “Winter Season”, “Rating”: 4})
+db.fruits.insertOne({“id”: 5, “Name”: “Plum”, ”Seasons”: “Monsoon Season”, “Rating”: 2})
+
+db.fruits.find().pretty()
+
+db.fruits.find({“id”: {$gt:3}}).pretty()
+
+db.fruits.find({“id”: {$lt:3}}).pretty()
+
+db.fruits.Update({“id”: “5”},{$set: {“Rating”: “4”}})
+
+db.fruits.remove({“id”: “5”})
+
+
+

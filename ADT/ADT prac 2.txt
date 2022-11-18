@@ -1,0 +1,37 @@
+CREATE TABLE employee(Dept_idnumber(5).emp_specification XMLTYPE);
+
+insert into employee values
+(1,XMLTYPE('<emp>
+<e_id>1</e_id>
+<ename>Andrew</ename>
+<email>Andrew@gmail.com</email>
+<acc_no>600</acc_no>
+<mngr_email>aditi@yahoo.com</mngr_email>
+<dob>19 nov 2000</dob>
+</emp>'));
+
+Select * from employee;
+
+select e.emp_specification.EXTRACT('/emp/ename/text()').getstringVal()”Name”,
+e.emp_specification.EXTRACT('/emp/acc_no/text()').getstringVal()”Account No”, e.emp_specification.EXTRACT('/emp/email/text()').getstringVal()”Email” from employee e;
+
+e.emp_specification=XMLTYPE('<emp>
+<e_id>5</e_id>
+<ename>Tristan</ename>
+<email>Tristan@yahoo.com</email>
+<acc_no>123</acc_no>
+<mngr_email>aditi@yahoo.com</mngr_email>
+<dob>9 mar 2011</dob>
+</emp>');
+
+update employee e set
+e.emp_specification=XMLTYPE('<emp>
+<e_id>5</e_id>
+<ename>Luc</ename>
+<email>Luc@yahoo.com</email>
+<acc_no>1000</acc_no>
+<mngr_email>aditi@yahoo.com</mngr_email>
+<dob>9 jan 2011</dob>
+</emp>') where e.emp_specification.EXTRACT('/emp/ename/text()').getStringVal()='Tristan';
+
+delete from employee e where e.emp_specification.EXTRACT('/emp/ename/text()').getstringVal()='Jordan';
