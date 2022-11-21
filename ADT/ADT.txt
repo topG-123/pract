@@ -1,0 +1,321 @@
+################ ADT Pract 1 ################
+################ Insert Update Delete in Table ################
+
+Create or replace type AddrType1 as object (PinQuery number (5), Street char(20), City varchar2(50), state varchar2(40), no number(4) );
+Create or replace type BranchType as object (address AddrType1, phone1 int, phone2 int );
+Create or replace type BranchTableType as table of BranchType;
+Create or replace type AuthorType as object (name varchar2 (50), addr AddrType1);
+Create table Author of AuthorType;
+Create or replace type AuthorListType as varray(10) of ref AuthorType ;
+Create or replace type PublisherType as object(name varchar2(50), addr AddrType1, branches BranchTableType);
+Create table Publishers of PublisherType NESTED TABLE branches STORE as branchtable;
+Create table books(title varchar2(50), year date, published_by ref PublisherType, authors AuthorListType);
+
+insert into Author values('Sahil', AddrType1(7000,'AT street', 'mumbai', 'maharashtra' ,1007));
+
+insert into Publishers values ('Sahil', AddrType1 (4002,'PK street', 'mumbai','maharashtra',03), BranchTableType(BranchType (AddrType1(5002,'PL street', 'mumbai', 'maharashtra', 03), 23406,69896)));
+
+insert into books select 'IP','28-may-1983', ref (pub), AuthorListType(ref(aut)) from Publishers pub, Author aut where pub.name='Sahil' and aut.name='andrew';
+
+insert into books select 'ADBMS','09-jan-1890',ref(pub), AuthorListType(ref(aut)) from Publishers pub, Author aut where pub.name='tristan' and aut.name='luc';
+
+insert into books select 'c prog','25-may-1983', ref (pub),AuthorListType(ref(aut)) from Publishers pub, Author aut where pub.name='Suyash' and aut.name='Sahil';
+
+select a.name from Author a, Publishers p where a.addr.pinQuery = p.addr.pinQuery;
+
+Select title from books b where 2 <= (select count(*) from table(b.authors));
+
+Select p.name from publishers p, table (p.branches)
+group by p.name having count(*)> = all (select count(*)from publishers p, table(p.branches) group by name);
+
+select a.name from authors a where not exists(select b.title from books b,table(select authors from books b1 where b.title=b1.title)where a.name=name);
+
+select a.name from authors a, books b, table (b.authors) v where v.column_value = ref(a) group by a.name having count(*) > 1;
+
+
+################ ADT Pract 2 ################
+################ XML ################
+
+CREATE TABLE employee(Dept_idnumber(5).emp_specification XMLTYPE);
+
+insert into employee values
+(1,XMLTYPE('<emp>
+<e_id>1</e_id>
+<ename>Andrew</ename>
+<email>Andrew@gmail.com</email>
+<acc_no>600</acc_no>
+<mngr_email>aditi@yahoo.com</mngr_email>
+<dob>19 nov 2000</dob>
+</emp>'));
+
+Select * from employee;
+
+select e.emp_specification.EXTRACT('/emp/ename/text()').getstringVal()”Name”,
+e.emp_specification.EXTRACT('/emp/acc_no/text()').getstringVal()”Account No”, e.emp_specification.EXTRACT('/emp/email/text()').getstringVal()”Email” from employee e;
+
+e.emp_specification=XMLTYPE('<emp>
+<e_id>5</e_id>
+<ename>Tristan</ename>
+<email>Tristan@yahoo.com</email>
+<acc_no>123</acc_no>
+<mngr_email>aditi@yahoo.com</mngr_email>
+<dob>9 mar 2011</dob>
+</emp>');
+
+update employee e set
+e.emp_specification=XMLTYPE('<emp>
+<e_id>5</e_id>
+<ename>Luc</ename>
+<email>Luc@yahoo.com</email>
+<acc_no>1000</acc_no>
+<mngr_email>aditi@yahoo.com</mngr_email>
+<dob>9 jan 2011</dob>
+</emp>') where e.emp_specification.EXTRACT('/emp/ename/text()').getStringVal()='Tristan';
+
+delete from employee e where e.emp_specification.EXTRACT('/emp/ename/text()').getstringVal()='Jordan';
+
+
+################ ADT Pract 3 ################
+################ Distributed DB Horizontal / Vertical Fragmentation ################
+
+
+conn system/patkar@db1
+
+create table employee(enumber int Primary key, ename varchar(20), address varchar(30), email varchar(20), salary int);
+
+insert into employee values(1,'andrew','Andheri','andrew@gmail.com',100000);
+insert into employee values(2,'tristan','churchgate','tristan@gmail.com',60000);
+insert into employee values(3,'luc','marines','luc@gmail.com',80000);
+insert into employee values(4,'peter','Borivali',peter@gmail.com',10000);
+insert into employee values(5,'jordan','Goregaon','jordan@gmail.com',20000);
+
+select * from employee;
+
+Create database link db1todb2 connect to system identified by patkar using 'db2';
+
+Conn system/patkar@db2
+
+Create database link db2todb1 connect to system identified by patkar using 'db1';
+
+Create table emp1 as select enumber, ename, salary from employee@db2todb1;
+
+select * from emp1;
+
+Create table emp2 as select enumber, ename, email from employee@db2todb1;
+
+select * from emp2;
+
+Create table emp3 as select enumber, email, address from employee@db2todb1;
+
+select * from emp3;
+
+Create table emp4 as select enumber, ename, address from employee@db2todb1;
+
+select * from emp4;
+
+Select salary from emp1;
+
+Select email form emp3 where address=’Andheri’;
+
+Select email, address form emp4 where enumber=3;
+
+
+
+################ ADT Pract 4 ################
+################ Spatial DB ################
+
+
+CREATE TABLE cola_mrp (mkt_id NUMBER PRIMARY KEY, name VARCHAR2(32), shape
+SDO_GEOMETRY);
+
+INSERT INTO cola_mrp VALUES(1,'cola_a', MDSYS.SDO_GEOMETRY(2003, NULL, NULL,
+MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3), MDSYS.SDO_ORDINATE_ARRAY(1,1, 5,7)));
+
+INSERT INTO cola_mrp VALUES(2,'cola_b', MDSYS.SDO_GEOMETRY(2003, NULL, NULL,
+MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3), MDSYS.SDO_ORDINATE_ARRAY(5,1, 8,1, 8,6, 5,7,
+5,1)));
+
+INSERT INTO cola_mrp VALUES(3,'cola_c', MDSYS.SDO_GEOMETRY(2003, NULL, NULL, MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3), MDSYS.SDO_ORDINATE_ARRAY(3,3, 6,3, 6,5, 4,5, 3,3)));
+
+INSERT INTO cola_mrp VALUES(4,'cola_d', MDSYS.SDO_GEOMETRY(2003, NULL, NULL, MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,4), MDSYS.SDO_ORDINATE_ARRAY(8,7, 10,9, 8,11)));
+
+SELECT SDO_GEOM.SDO_INTERSECTION(c_a.shape,c_c.shape,0.005)FROM cola_mrp c_a,cola_mrp c_c WHERE c_a.name='cola_a' AND c_c.name='cola_c';
+
+SELECT SDO_GEOM.RELATE(c_c.shape, 'EQUAL', c_a.shape,0.005)FROM cola_mrp c_c, cola_mrp c_a WHERE c_c.name='cola_c' AND c_a.name = 'cola_a';
+
+SELECT name,SDO_GEOM.SDO_AREA(shape,0.005) FROM cola_mrp;
+
+SELECT c.name,SDO_GEOM.SDO_AREA(c.shape,0.005) FROM cola_mrp c WHERE c.name='cola_a';
+
+SELECT SDO_GEOM.SDO_DISTANCE(c_b.shape,c_d.shape,0.005)FROM cola_mrp c_b,cola_mrp c_d WHERE c_b.name= 'cola_b' AND c_d.name ='cola_d';
+
+
+
+################ ADT Pract 5 ################
+################ Temporal DB ################
+
+
+create table student(roll number(10), s_name varchar(15), s_join_date date, s_leavedate date);
+
+insert into student values(101,’Andrew’,’06-june-2006’,’06-june-2009’);
+insert into student values(102,’Tristan’,’08-feb-2007’,’08-mar-2009’);
+insert into student values(103,’Luc’,’12-mar-2007’,’16-apr-2009’);
+insert into student values(104,’Peter’,’19-apr-2008’,’10-may-2009’);
+insert into student values(105,’Jordan’,’20-jan-2009’,’10-oct-2014’);
+
+select * from student;
+
+commit;
+
+select * from student where s_join_date=‟19-apr-08‟;
+
+create table time_shares
+(C_name varchar2(20),
+No_shares number(10),
+Price number(10),
+Trans_Time varchar2(10) Default to_char(sysdate, „HH:MI‟));
+
+insert into time_shares values('Andrew',121,600,To_char(sysdate,'HH:MI'));
+insert into time_shares values('Tristan',123,500,To_char(sysdate,'HH:MI'));
+insert into time_shares values('Luc',141,251,To_char(sysdate,'HH:MI'));
+insert into time_shares values('Peter',203,700,To_char(sysdate,'HH:MI'));
+insert into time_shares values('Jordan',200,551,To_char(sysdate,'HH:MI'));
+
+Read records from table where price >= 500 and TransTime=‟09:57‟;
+select * from time_shares where price>100 and trans_time='12:52';
+
+
+################ ADT Pract 6.1 ################
+################ Mongo DB CRUD ################
+
+#mongo db#
+db.createCollection("andrew_tate")
+
+db.fruits.insertOne({“id”: 1, “Name”: “Apple”, ”Seasons”: “All Season”, “Rating”: 3})
+db.fruits.insertOne({“id”: 2, “Name”: “Mango”, ”Seasons”: “Summer Season”, “Rating”: 5})
+db.fruits.insertOne({“id”: 3, “Name”: “Banana”, ”Seasons”: “All Season”, “Rating”: 3})
+db.fruits.insertOne({“id”: 4, “Name”: “Grapes”, ”Seasons”: “Winter Season”, “Rating”: 4})
+db.fruits.insertOne({“id”: 5, “Name”: “Plum”, ”Seasons”: “Monsoon Season”, “Rating”: 2})
+
+db.fruits.find().pretty()
+
+db.fruits.find({“id”: {$gt:3}}).pretty()
+
+db.fruits.find({“id”: {$lt:3}}).pretty()
+
+db.fruits.Update({“id”: “5”},{$set: {“Rating”: “4”}})
+
+db.fruits.remove({“id”: “5”})
+
+
+
+################ ADT Pract 6.2 ################
+################ Redis CRUD ################
+
+Create Operation:
+set info "This is Create Operation in Redis"
+
+Read Operation:
+get info
+
+Update Operation:
+set info "This is the updated value of key in Redis"
+
+Delete Operation:
+del info
+
+################ ADT Pract 7 ################
+################ Cassandra CRUD ################
+
+
+1> Open cmd and type cassandra -f (do not close this cmd)
+2> Open new cmd and type cqlsh
+3> Perform query
+
+a> Create Database Query
+CREATE KEYSPACE employee WITH replication = {'class': 'SimpleStrategy',
+'replication_factor': '1'};
+
+b> Use Table Query
+use employee;
+
+c> Create Table Query
+CREATE TABLE employee(ID int, Name text Primary Key, City text);
+
+d> Insert Query
+Insert into employee (ID,City,Name) values(01,'Mumbai','emp1');
+Insert into employee (ID,City,Name) values(02,'Pune','emp2');
+Insert into employee (ID,City,Name) values(03,'Goa','emp3');
+Insert into employee (ID,City,Name) values(04,'Mirzapur','emp4');
+Insert into employee (ID,City,Name) values(05,'Mulshi','emp5');
+
+e> Read Query
+select * from employee;
+
+f> Update Query
+update employee SET city=’Satara’ where name=’emp2’;
+
+g> Delete Query
+DELETE city FROM employee WHERE name = ‘emp5’;
+
+
+################ ADT Pract 8.1 ################
+################ Mongo DB indexing ################
+
+#To create a collection
+db.createCollection("andrew")
+
+#To create indexes
+db.andrew.createIndex({“name”:1})
+db.andrew.createIndex({“salary”:2})
+
+#To get indexes
+db.andrew.getIndexes()
+
+
+################ ADT Pract 8.2 ################
+################ Couch DB indexing ################
+
+1)Install CouchDB 
+While installation set your username and password.
+2)Launch Apache CouchDB Fauxton 
+Login using username and password.
+
+Click on Create Database > provide database name: test > Create
+
+Database gets created successfully.
+Now, insert data in the database, by clicking on „Create document‟ on RHS
+
+Insert column name and data, after id tag (id tag is already created do not modify it.)
+
+Insert multiple records
+
+Now, click on „Run a query with Mango‟ > click on „manage indexes‟
+
+
+################ ADT Pract 8.3 ################
+################ Cassandra DB indexing ################
+
+Creating a table named “student”
+create table student (id int, name text Primary Key, branch text, phone varint, city text);
+
+Inserting data into the table “student”
+INSERT INTO student (id, name, branch, phone, city)VALUES (1, 'Lara', 'Computer Engineering',9999999999, 'Boston');
+INSERT INTO student (id, name, branch, phone, city)VALUES (2, 'Krunal', 'Electrical Engineering',8888888888, 'New York City');
+INSERT INTO student (id, name, branch, phone, city)VALUES (3, 'Myra', 'Applied Physics',7777777777, 'London');
+INSERT INTO student (id, name, branch, phone, city) VALUES (4, 'Nysa', 'MBA', 5555555555,'UK');
+INSERT INTO student (id, name, branch, phone, city) VALUES (5, 'Mayur', 'MSC', 6666666666,'Australia');
+
+Read Operation:
+SELECT *FROM student;
+
+Update Operation:
+UPDATE student SET city='San Fransisco'WHERE name = 'Nysa';
+Read operation: 
+SELECT *FROM student;
+
+Delete Operation:
+DELETE phone FROM student WHERE name = 'Lara';
+Read operation:
+SELECT *FROM student;
+
