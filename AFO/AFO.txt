@@ -1,0 +1,513 @@
+Contour Plot
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+x_axis = np.arange(0, 10, 1)
+y_axis = np.arange(0, 20, 2)
+
+[x, y] = np.meshgrid(x_axis, y_axis)
+fig, ax = plt.subplots(1, 1)
+z = np.cos(x/2) + np.sin(y/4)
+
+ax.contour(x, y, z)
+ax.set_title('Contour Plot')
+ax.set_xlabel('arrange_x')
+ax.set_ylabel('arrange_y')
+
+plt.show()
+
+Fibonacci 
+
+a = int(input("enter len of fibonacci series: "))
+myArray = []
+n1 = 0
+n2 = 1
+n3 = 1
+myArray.append(n1)
+myArray.append(n2)
+myArray.append(n3)
+for i in range(0, (a - 3)):
+    num4 = (myArray[i+1] + myArray[i+2])
+    myArray.append(num4)
+print(myArray)
+b = int(input("enter element to find: "))
+for i in range(0, len(myArray)):
+    if (myArray[i] == b):
+        print("number present in fibonacci series at index:", i+1)
+    else:
+        print("")
+
+Golden Section Search
+
+import numpy as np
+import matplotlib.pyplot as plt
+from IPython.display import clear_output
+import time
+def func_fx(x):
+    fx=np.sin(x)
+    return fx
+def check_pos(x1,x2):
+    if x2<x1:
+        label='right'
+    else:
+        label=''
+    return label
+def update_interior(xl,xu):
+    d=((np.sqrt(5)-1)/2)*(xu-xl)
+    x1=xl+d
+    x2=xu-d
+    return x1,x2
+#FINDING MAXIMUM FUNCTION
+def find_max(xl,xu,x1,x2,label):
+    fx1=func_fx(x1)
+    fx2=func_fx(x2)
+    if fx2>fx1 and label=='right':
+        xl=xl
+        xu=x1
+        new_x=update_interior(xl,xu)
+        x1=new_x[0]
+        x2=new_x[1]
+        xopt=x2
+    else:
+        xl=x2
+        xu=xu
+        new_x=update_interior(xl,xu)
+        x1=new_x[0]
+        x2=new_x[1]
+        xopt=x1
+    return xl,xu,xopt
+#FINDING MINIMUM FUNCTION
+def find_min(xl,xu,x1,x2,label):
+    fx1=func_fx(x1)
+    fx2=func_fx(x2)
+    if fx2>fx1 and label=='right':
+        xl=x2
+        xu=xu
+        new_x=update_interior(xl,xu)
+        x1=new_x[0]
+        x2=new_x[1]
+        xopt=x1
+    else:
+        xl=xl
+        xu=x1
+        new_x=update_interior(xl,xu)
+        x1=new_x[0]
+        x2=new_x[1]
+        xopt=x2
+    return xl,xu,xopt
+#PLOTTING FUNCTION
+def plot_graph(xl,xu,x1,x2):
+    clear_output(wait=True)
+    #plot sinus graph
+    plt.plot(x,y)
+    plt.plot([0,6],[0,0],'k')
+    #plot x1 point
+    plt.plot(x1,func_fx(x1),'ro',label='x1')
+    plt.plot([x1,x1],[0,func_fx(x1)],'k')
+    #plot x2 point
+    plt.plot(x2,func_fx(x2),'bo',label='x2')
+    plt.plot([x2,x2],[0,func_fx(x2)],'k')
+    #plot xl line
+    plt.plot([xl,xl],[0,func_fx(xl)])
+    plt.annotate('xl',xy=(xl-0.01,-0.2))
+    #plot xu line
+    plt.plot([xu,xu],[0,func_fx(xu)])
+    plt.annotate('xu',xy=(xu-0.01,-0.2))
+    #plot x1 line
+    plt.plot([x1,x1],[0,func_fx(x1)],'k')
+    plt.annotate('x1',xy=(x1-0.01,-0.2))
+    #plot x2 line
+    plt.plot([x2,x2],[0,func_fx(x2)],'k')
+    plt.annotate('x2',xy=(x2-0.01,-0.2))
+    #y-axis limit
+    plt.ylim([-1.2,1.2])
+    plt.show()
+def golden_search(xl,xu,mode,et):
+    it=0
+    e=1
+    while e>=et:
+        new_x=update_interior(xl,xu)
+        x1=new_x[0]
+        x2=new_x[1]
+        fx1=func_fx(x1)
+        fx2=func_fx(x2)
+        label=check_pos(x1,x2)
+        clear_output(wait=True)
+        plot_graph(xl,xu,x1,x2) #PLOTTING
+        plt.show()
+        #SELECTING AND UPDATING BOUNDARY-INTERIOR POINTS
+        if mode=='max':
+            new_boundary=find_max(xl,xu,x1,x2,label)
+        elif mode=='min':
+            new_boundary=find_min(xl,xu,x1,x2,label)
+        else:
+            print('Please define min/max mode')
+            break #exit if mode not min or max
+        xl=new_boundary[0]
+        xu=new_boundary[1]
+        xopt=new_boundary[2]
+        it+=1
+        print ('Iteration: ',it)
+        r=(np.sqrt(5)-1)/2 #GOLDEN RATIO
+        e=((1-r)*(abs((xu-xl)/xopt)))*100 #Error
+        print('Error:',e)
+        time.sleep(1)
+#GENERATE POINT FOR SINE GRAPH
+x=np.linspace(0,6,100)
+y=func_fx(x)
+#EXECUTING GOLDEN SEARCH FUNCTION
+golden_search(0,6,'max',0.05)
+
+Gradient Descent
+
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import sklearn.datasets as dt
+from sklearn.model_selection import train_test_split
+# Make threshold a -ve value if you want to run exactly
+# max_iterations.
+def gradient_descent(max_iterations,threshold,w_init,
+                     obj_func,grad_func,extra_param = [],
+                     learning_rate=0.05,momentum=0.8):
+    
+    w = w_init
+    w_history = w
+    f_history = obj_func(w,extra_param)
+    delta_w = np.zeros(w.shape)
+    i = 0
+    diff = 1.0e10
+    
+    while  i<max_iterations and diff>threshold:
+        delta_w = -learning_rate*grad_func(w,extra_param) + momentum*delta_w
+        w = w+delta_w
+        
+        # store the history of w and f
+        w_history = np.vstack((w_history,w))
+        f_history = np.vstack((f_history,obj_func(w,extra_param)))
+        
+        # update iteration number and diff between successive values
+        # of objective function
+        i+=1
+        diff = np.absolute(f_history[-1]-f_history[-2])
+    
+    return w_history,f_history
+def visualize_fw():
+    xcoord = np.linspace(-10.0,10.0,50)
+    ycoord = np.linspace(-10.0,10.0,50)
+    w1,w2 = np.meshgrid(xcoord,ycoord)
+    pts = np.vstack((w1.flatten(),w2.flatten()))
+    
+    # All 2D points on the grid
+    pts = pts.transpose()
+    
+    # Function value at each point
+    f_vals = np.sum(pts*pts,axis=1)
+    function_plot(pts,f_vals)
+    plt.title('Objective Function Shown in Color')
+    plt.show()
+    return pts,f_vals
+
+# Helper function to annotate a single point
+def annotate_pt(text,xy,xytext,color):
+    plt.plot(xy[0],xy[1],marker='P',markersize=10,c=color)
+    plt.annotate(text,xy=xy,xytext=xytext,
+                 # color=color,
+                 arrowprops=dict(arrowstyle="->",
+                 color = color,
+                 connectionstyle='arc3'))
+
+# Plot the function
+# Pts are 2D points and f_val is the corresponding function value
+def function_plot(pts,f_val):
+    f_plot = plt.scatter(pts[:,0],pts[:,1],
+                         c=f_val,vmin=min(f_val),vmax=max(f_val),
+                         cmap='RdBu_r')
+    plt.colorbar(f_plot)
+    # Show the optimal point
+    annotate_pt('global minimum',(0,0),(-5,-7),'yellow')    
+
+pts,f_vals = visualize_fw()
+
+Qaudratic
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+ones = np.ones(3)
+A = np.array( ((0,1),(1,1),(2,1)))
+xfeature = A.T[0]
+squaredfeature = A.T[0] ** 2
+b = np.array( (1,2,0), ndmin=2 ).T
+b = b.reshape(3)
+features = np.concatenate((np.vstack(ones), np.vstack(xfeature), np.vstack(squaredfeature)), axis = 1)
+featuresc = features.copy()
+print(features)
+m_det = np.linalg.det(features)
+print(m_det)
+determinants = []
+
+for i in range(3):
+    featuresc.T[i] = b
+    print(featuresc)
+    det = np.linalg.det(featuresc)
+    determinants.append(det)
+    print(det)
+    featuresc = features.copy()
+determinants = determinants / m_det
+print(determinants)
+plt.scatter(A.T[0],b)
+u = np.linspace(0,3,100)
+plt.plot(u, u**2*determinants[2] + u*determinants[1] + determinants[0] )
+p2 = np.polyfit(A.T[0],b,2)
+plt.plot(u, np.polyval(p2,u), 'b--')
+plt.show()
+
+Quassi-Newton
+
+import matplotlib
+import numpy as np
+import matplotlib.pyplot as plt
+
+# define objective function
+def f(x):
+    x1 = x[0]
+    x2 = x[1]
+    obj = x1**2 - 2.0 * x1 * x2 + 4 * x2**2
+    return obj
+# define objective gradient
+def dfdx(x):
+    x1 = x[0]
+    x2 = x[1]
+    grad = []
+    grad.append(2.0 * x1 - 2.0 * x2)
+    grad.append(-2.0 * x1 + 8.0 * x2)
+    return grad
+# Exact 2nd derivatives (hessian)
+H = [[2.0, -2.0],[-2.0, 8.0]]
+# Start location
+x_start = [-3.0, 2.0]
+# Design variables at mesh points
+i1 = np.arange(-4.0, 4.0, 0.1)
+i2 = np.arange(-4.0, 4.0, 0.1)
+x1_mesh, x2_mesh = np.meshgrid(i1, i2)
+f_mesh = x1_mesh**2 - 2.0 * x1_mesh * x2_mesh + 4 * x2_mesh**2
+# Create a contour plot
+plt.figure()
+# Specify contour lines
+lines = range(2,52,2)
+# Plot contours
+CS = plt.contour(x1_mesh, x2_mesh, f_mesh,lines)
+# Label contours
+plt.clabel(CS, inline=1, fontsize=10)
+# Add some text to the plot
+plt.title(r'$f(x)=x_1^2 - 2x_1x_2 + 4x_2^2$')
+plt.xlabel(r'$x_1$')
+plt.ylabel(r'$x_2$')
+# Number of iterations
+n = 8
+# Use this alpha for every line search
+alpha = np.linspace(0.1,1.0,n)
+# Initialize delta_xq and gamma
+delta_xq = np.zeros((2,1))
+gamma = np.zeros((2,1))
+part1 = np.zeros((2,2))
+part2 = np.zeros((2,2))
+part3 = np.zeros((2,2))
+part4 = np.zeros((2,2))
+part5 = np.zeros((2,2))
+part6 = np.zeros((2,1))
+part7 = np.zeros((1,1))
+part8 = np.zeros((2,2))
+part9 = np.zeros((2,2))
+# Initialize xq
+xq = np.zeros((n+1,2))
+xq[0] = x_start
+# Initialize gradient storage
+g = np.zeros((n+1,2))
+g[0] = dfdx(xq[0])
+# Initialize hessian storage
+h = np.zeros((n+1,2,2))
+h[0] = [[1, 0.0],[0.0, 1]]
+for i in range(n):
+    # Compute search direction and magnitude (dx)
+    # with dx = -alpha * inv(h) * grad
+    delta_xq = -np.dot(alpha[i],np.linalg.solve(h[i],g[i]))
+    xq[i+1] = xq[i] + delta_xq
+    # Get gradient update for next step
+    g[i+1] = dfdx(xq[i+1])
+    # Get hessian update for next step
+    gamma = g[i+1]-g[i]
+    part1 = np.outer(gamma,gamma)
+    part2 = np.outer(gamma,delta_xq)
+    part3 = np.dot(np.linalg.pinv(part2),part1)
+    part4 = np.outer(delta_xq,delta_xq)
+    part5 = np.dot(h[i],part4)
+    part6 = np.dot(part5,h[i])
+    part7 = np.dot(delta_xq,h[i])
+    part8 = np.dot(part7,delta_xq)
+    part9 = np.dot(part6,1/part8)
+    h[i+1] = h[i] + part3 - part9
+plt.plot(xq[:,0],xq[:,1],'r-o')
+plt.savefig('contour.jpeg')
+plt.show()
+
+Radial
+
+import numpy as np
+import matplotlib.pyplot as plt
+from smt.surrogate_models import RBF
+xt = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+yt = np.array([0.0, 1.0, 1.5, 0.9, 1.0])
+sm = RBF(d0=5)
+sm.set_training_values(xt, yt)
+sm.train()
+num = 100
+x = np.linspace(0.0, 4.0, num)
+y = sm.predict_values(x)
+plt.plot(xt, yt, "o")
+plt.plot(x, y)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend(["Training data", "Prediction"])
+plt.show()
+
+Gaussian
+
+import matplotlib.pylab as plt
+import numpy as np
+import GPy
+import GPyOpt
+import seaborn as sns
+noise_var = 1e-6
+n_samples = 1
+def generate_noisy_points(n=10, noise_variance=1e-6):
+  np.random.seed(777)
+  X = np.random.uniform(-3., 3., (n, 1))
+  y = np.sin(X) + np.random.randn(n, 1) * noise_variance**0.5
+  return X, y
+def kernel(x, y, l2=4):
+  sqdist = np.sum(x**2,1).reshape(-1,1) + \
+  np.sum(y**2,1) - 2*np.dot(x, y.T)
+  return np.exp(-.5 * (1/l2) * sqdist)
+X, y = generate_noisy_points()
+plt.plot(X, y, 'x')
+plt.show()
+Xtest, ytest = generate_noisy_points(100)
+Xtest.sort(axis=0)
+N, n = len(X), len(Xtest)
+K = kernel(X, X)
+L = np.linalg.cholesky(K + noise_var*np.eye(N))
+K_ = kernel(Xtest, Xtest)
+Lk = np.linalg.solve(L, kernel(X, Xtest))
+mu = np.dot(Lk.T, np.linalg.solve(L, y))
+L = np.linalg.cholesky(K_ + noise_var*np.eye(n) - np.dot(Lk.T, Lk))
+f_post = mu.reshape(-1,1) + np.dot(L, np.random.normal(size=(n,n_samples)))
+n = len(Xtest)
+K = kernel(Xtest, Xtest)
+L = np.linalg.cholesky(K + 1e-6*np.eye(n))
+f_prior = np.dot(L, np.random.normal(size=(n, n_samples)))
+def posterior(X, Xtest, l2=0.1, noise_var=1.6):
+  # compute the mean at our test points.
+  N, n = len(X), len(Xtest)
+  K = kernel(X, X, l2)
+  L = np.linalg.cholesky(K + noise_var*np.eye(N))
+  Lk = np.linalg.solve(L, kernel(X, Xtest, l2))
+  mu = np.dot(Lk.T, np.linalg.solve(L, y))
+  # compute the variance at our test points.
+  K_ = kernel(Xtest, Xtest, l2)
+  sd = np.sqrt(np.diag(K_) - np.sum(Lk**2, axis=0))
+  return (mu, sd)
+mu, sd = posterior(X, np.array([[1]]))
+print(mu, sd)
+sigma_f, l = 1.5, 2
+kernel = GPy.kern.RBF(1, sigma_f, l)
+sns.heatmap(kernel.K(X, X))
+plt.show()
+X, y = generate_noisy_points(noise_variance=0.01)
+model = GPy.models.GPRegression(X,y,kernel)
+mean, variance = model.predict(np.array([[1]]))
+print(mean, variance)
+print(model)
+model.plot()
+plt.show()
+
+Random Forest
+
+#Import libraries #%matplotlib inline
+import  matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+from sklearn import tree
+from  sklearn.ensemble import RandomForestClassifier
+from  sklearn.tree import DecisionTreeRegressor
+from  sklearn.ensemble import RandomForestRegressor
+from  IPython.display import display
+import statsmodels.api  as sm 
+# Import make_regression method to generate artificial data samples
+from  sklearn.datasets import make_regression
+ 
+n_samples = 100 # Number of samples
+n_features = 6  
+n_informative = 3 # Number of informative features i.e. actual features which influence the  output 
+X, y,coef = make_regression(n_samples=n_samples, n_features=n_features,  n_informative=n_informative, random_state=None, shuffle=False,noise=20,coef=True) 
+#Make a data frame and create basic visualizations
+df1 = pd.DataFrame(data=X,columns=['X'+str(i) for i in range(1,n_features+1)])
+df2=pd.DataFrame(data=y,columns=['y'])
+df=pd.concat([df1,df2],axis=1)
+df.head(10)
+display(df) 
+#Scatter plots
+with plt.style.context(('seaborn-dark')):
+    for i,col in enumerate(df.columns[:-1]): 
+        plt.figure(figsize=(6,4)) 
+        plt.grid(True)  
+        plt.xlabel('Feature:'+col,fontsize=12)  
+        plt.ylabel('Output: y',fontsize=12)  
+        plt.scatter(df[col],df['y'],c='red',s=50,alpha=0.6)  
+        plt.show()
+with plt.style.context(('fivethirtyeight')):
+    for i,col in enumerate(df.columns[:-1]): 
+        plt.figure(figsize=(6,4))  
+        plt.grid(True)  
+        plt.xlabel('Feature:'+col,fontsize=12)  
+        plt.ylabel('Output: y',fontsize=12)  
+        plt.hist(df[col],alpha=0.6,facecolor='g')  
+        plt.show() 
+tree_model = tree.DecisionTreeRegressor(max_depth=5,random_state=None)
+tree_model.fit(X,y) 
+DecisionTreeRegressor(criterion='mse', max_depth=5, max_features=1.0,  max_leaf_nodes=None, min_impurity_decrease=0.0, min_samples_leaf=1, min_samples_split=2, min_weight_fraction_leaf=0.0, random_state=None, splitter='best') 
+print("Relative importance of the features: ",tree_model.feature_importances_)
+with  plt.style.context('dark_background'):
+    plt.figure(figsize=(10,7))
+    plt.grid(True)
+    plt.yticks(range(n_features+1,1,- 1),df.columns[:-1],fontsize=20)
+    plt.xlabel("Relative (normalized) importance of  parameters",fontsize=15)
+    plt.ylabel("Features\n",fontsize=20)  
+    plt.barh(range(n_features+1,1,-1),width=tree_model.feature_importances_,height=0.5)
+    plt.show() 
+print("Regression coefficient:",tree_model.score(X,y)) 
+model = RandomForestRegressor(max_depth=5, random_state=None,max_features=1.0,max_leaf_nodes=5,n_estimators=100)
+model.fit(X, y) 
+RandomForestRegressor(bootstrap=True, criterion='mse', max_depth=5,  max_features=1.0, max_leaf_nodes=5, min_impurity_decrease=0.0, min_samples_leaf=1, min_samples_split=2, min_weight_fraction_leaf=0.0,n_estimators=100, n_jobs=1, oob_score=False,random_state=None, verbose=0, warm_start=False) 
+print("Relative importance of the features: ",model.feature_importances_)
+with  plt.style.context('dark_background'): 
+    plt.figure(figsize=(10,7))
+    plt.grid(True)
+    plt.yticks(range(n_features+1,1,- 1),df.columns[:-1],fontsize=20)
+    plt.xlabel("Relative (normalized) importance of  parameters",fontsize=15)
+    plt.ylabel("Features\n",fontsize=20)  
+    plt.barh(range(n_features+1,1,-1),width=model.feature_importances_,height=0.5)
+    plt.show()
+print("Regression coefficient:",model.score(X,y)) 
+Xs=sm.add_constant(X)
+stat_model = sm.OLS(y,Xs)
+stat_result = stat_model.fit() 
+print(stat_result.summary()) 
+rf_coef=np.array(coef)
+stat_coef=np.array(stat_result.params[1:])
+df_coef = pd.DataFrame(data=[rf_coef,stat_coef],columns=df.columns[:- 1],index=['True Regressors', 'OLS method estimation'])
+df_coef
+df_importance = pd.DataFrame(data=[model.feature_importances_,stat_result.tvalues[1:]/sum(stat_result.tvalues[1:])], columns=df.columns[:-1], index=['RF Regressor relative importance', 'OLS method normalized  tstatistic']) 
+df_importance 
